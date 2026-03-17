@@ -147,6 +147,23 @@ def map_input(data: dict):
         "housing": housing_map[data["housing"]],
     }
 
+def get_decision(prob):
+
+    if prob < 0.3:
+        return {
+            "risk_level": "LOW",
+            "decision": "APPROVE"
+        }
+    elif prob < 0.6:
+        return {
+            "risk_level": "MEDIUM",
+            "decision": "REVIEW"
+        }
+    else:
+        return {
+            "risk_level": "HIGH",
+            "decision": "REJECT"
+        }
 
 # =========================
 # API ENDPOINT
@@ -178,6 +195,10 @@ def predict(data: CreditInput):
     # prediction
     prob = model.predict_proba(df)[0][1]
 
+    decision = get_decision(prob)
+
     return {
-        "default_probability": float(prob)
+        "default_probability": float(prob),
+        "risk_level": decision["risk_level"],
+        "decision": decision["decision"]
     }
