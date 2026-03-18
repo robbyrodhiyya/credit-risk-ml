@@ -8,7 +8,7 @@ from enum import Enum
 app = FastAPI()
 
 # =========================
-# Load model & features
+# LOAD MODEL & FEATURES
 # =========================
 
 model = joblib.load("model/credit_model.pkl")
