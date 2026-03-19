@@ -4,7 +4,8 @@ import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, roc_auc_score
-
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
 
 # Load dataset
 df = pd.read_csv("data/credit_data.csv")
@@ -56,6 +57,13 @@ model = LogisticRegression(max_iter=1000)
 
 model.fit(X_train, y_train)
 
+# jumlah feature
+n_features = X_train.shape[1]
+
+initial_type = [("input", FloatTensorType([None, n_features]))]
+
+onnx_model = convert_sklearn(model, initial_types=initial_type)
+
 
 # Evaluation
 y_pred = model.predict(X_test)
@@ -79,5 +87,11 @@ joblib.dump(model, "model/credit_model.pkl")
 joblib.dump(X.columns.tolist(), "model/features.pkl")
 
 
+# Save ONNX model
+with open("model/credit_model.onnx", "wb") as f:
+    f.write(onnx_model.SerializeToString())
+
+
 print("\nModel saved to: model/credit_model.pkl")
 print("Feature list saved to: model/features.pkl")
+print("ONNX model saved to: model/credit_model.onnx")
